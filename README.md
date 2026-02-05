@@ -25,7 +25,24 @@ Test the C Program for the desired output.
 
 ## C Program to create new process using Linux API system calls fork() and getpid() , getppid() and to print process ID and parent Process ID using Linux API system calls
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
+int main() {
+    int pid = fork();
+
+    if (pid == 0) {
+        printf("I am child, my PID is %d\n", getpid());
+        printf("My parent PID is %d\n", getppid());
+        sleep(2);   // keep child alive
+    } else {
+        printf("I am parent, my PID is %d\n", getpid());
+        wait(NULL);
+    }
+    return 0;
+}
 
 
 
@@ -38,6 +55,7 @@ Test the C Program for the desired output.
 
 
 ##OUTPUT
+<img width="1002" height="290" alt="image" src="https://github.com/user-attachments/assets/5b6fefad-fe2c-4048-bea0-e482570b650b" />
 
 
 
@@ -48,7 +66,46 @@ Test the C Program for the desired output.
 
 ## C Program to execute Linux system commands using Linux API system calls exec() , exit() , wait() family
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
+int main() {
+    int status;
+    
+    printf("Running ps with execl\n");
+    if (fork() == 0) {
+        execl("ps", "ps", "-f", NULL);
+        perror("execl failed");
+        exit(1);
+    }
+    wait(&status);
+    
+    if (WIFEXITED(status)) {
+        printf("Child exited with status: %d\n", WEXITSTATUS(status));
+    } else {
+        printf("Child did not exit successfully\n");
+    }
+    
+    printf("Running ps with execlp (without full path)\n");
+    if (fork() == 0) {
+        execlp("ps", "ps", "-f", NULL);
+        perror("execlp failed");
+        exit(1);
+    }
+    wait(&status);
+    
+    if (WIFEXITED(status)) {
+        printf("Child exited for execlp with status: %d\n", WEXITSTATUS(status));
+    } else {
+        printf("Child did not exit successfully\n");
+    }
+    
+    printf("Done.\n");
+    return 0;
+}
 
 
 
@@ -75,6 +132,7 @@ Test the C Program for the desired output.
 
 ##OUTPUT
 
+<img width="999" height="90" alt="image" src="https://github.com/user-attachments/assets/6baac796-0f4a-47b3-b41e-951a1b758a62" />
 
 
 
